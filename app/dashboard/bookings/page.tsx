@@ -4,6 +4,8 @@ import { formatPrice, formatDate } from '@/lib/utils'
 import { redirect } from 'next/navigation'
 import { CalendarDays } from 'lucide-react'
 import BookingStatusButton from './booking-status-button'
+import ManualBookingForm from '@/components/bookings/manual-booking-form'
+import { getMyListings } from '@/lib/actions/listings'
 
 export const metadata = {
   title: 'Bookings',
@@ -24,10 +26,16 @@ export default async function BookingsPage() {
   const isAgent = profile?.role === 'agent' || profile?.role === 'admin'
   const myBookings = await getMyBookings()
   const incomingBookings = isAgent ? await getBookingsForMyListings() : []
+  const myListings = isAgent ? await getMyListings() : []
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-slate-900">Bookings</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-slate-900">Bookings</h1>
+        {isAgent && (
+          <ManualBookingForm listings={myListings} />
+        )}
+      </div>
 
       {/* Incoming Bookings (for agents) */}
       {isAgent && incomingBookings.length > 0 && (

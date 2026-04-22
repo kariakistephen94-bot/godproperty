@@ -17,11 +17,27 @@ export interface ListingFilters {
 export async function getListings(filters: ListingFilters = {}): Promise<ListingWithImages[]> {
   const supabase = await createClient()
 
+  // Auto-exclude listings that are currently booked out
+  const today = new Date().toISOString().split('T')[0]
+  const { data: bookedListings } = await supabase
+    .from('bookings')
+    .select('listing_id')
+    .eq('status', 'confirmed')
+    .lte('check_in', today)
+    .gt('check_out', today)
+
+  const excludedIds = bookedListings?.map(b => b.listing_id) || []
+
   let query = supabase
     .from('listings')
     .select('*, listing_images(*)')
     .eq('is_published', true)
-    .order('created_at', { ascending: false })
+
+  if (excludedIds.length > 0) {
+    query = query.not('id', 'in', `(${excludedIds.join(',')})`)
+  }
+
+  query = query.order('created_at', { ascending: false })
 
   if (filters.type) {
     query = query.eq('type', filters.type)

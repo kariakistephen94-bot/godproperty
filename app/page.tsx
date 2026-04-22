@@ -43,7 +43,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-zinc-600 mb-10 max-w-xl leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Discover rentals and short stays that feel like home. Browse our exclusive catalog of premium properties and book instantly.
+              Discover rentals and short stays that feel like home. Browse our exclusive catalog of premium properties and contact us for bookings.
             </p>
 
             {/* CTA */}
@@ -103,7 +103,7 @@ export default async function HomePage() {
                 <Sparkles className="w-7 h-7" />
               </div>
               <h3 className="text-2xl font-bold text-zinc-900 mb-2">Short Stays</h3>
-              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">Book unique stays for vacations, getaways, and business trips.</p>
+              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">Browse unique stays for vacations, getaways, and business trips.</p>
               <span className="inline-flex items-center gap-1.5 text-orange-600 font-semibold text-sm group-hover:gap-3 transition-all">
                 Browse Stays <ArrowRight className="w-4 h-4" />
               </span>
@@ -180,8 +180,8 @@ export default async function HomePage() {
               },
               {
                 icon: <Zap className="w-7 h-7" />,
-                title: 'Instant Booking',
-                desc: 'Reserve your next home in seconds. No waiting, no middlemen — just book and move in.',
+                title: 'Hassle-free Booking',
+                desc: 'We handle everything for you. Just call or WhatsApp us to secure your next home.',
                 color: 'bg-amber-50 text-amber-600',
               },
               {
