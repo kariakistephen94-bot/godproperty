@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/providers/auth-provider";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
+import WhatsAppButton from "@/components/ui/whatsapp-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
+          <WhatsAppButton />
         </AuthProvider>
       </body>
     </html>
