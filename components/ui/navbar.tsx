@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/providers/auth-provider'
 import { logout } from '@/lib/actions/auth'
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, ChevronDown, Home, Search, LayoutDashboard, MessageSquare, LogOut, User, Plus } from 'lucide-react'
+import { Menu, X, ChevronDown, Home, Search, LayoutDashboard, MessageSquare, LogOut, User, Plus, Phone } from 'lucide-react'
 import { cn, getInitials } from '@/lib/utils'
 
 export default function Navbar() {
@@ -94,14 +94,10 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link href="/auth/login" className="px-4 py-2 text-sm font-semibold text-zinc-700 hover:text-zinc-900 rounded-xl hover:bg-zinc-100 transition-all">
-                  Log in
-                </Link>
-                <Link href="/auth/signup" className="px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 btn-press transition-all">
-                  Sign up
-                </Link>
-              </div>
+              <a href="tel:+2348000000000" className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 btn-press transition-all">
+                <Phone className="w-4 h-4" />
+                Call Now
+              </a>
             )}
           </div>
 
@@ -125,24 +121,22 @@ export default function Navbar() {
                   <MobileNavLink href="/dashboard" onClick={() => setMobileOpen(false)} icon={<LayoutDashboard className="w-5 h-5" />}>Dashboard</MobileNavLink>
                 </>
               )}
-              <div className="border-t border-zinc-100 pt-4 mt-4">
-                {user ? (
+              {user ? (
+                <div className="border-t border-zinc-100 pt-4 mt-4">
                   <form action={logout}>
                     <button type="submit" className="flex items-center gap-3 w-full px-4 py-3 text-red-600 rounded-xl hover:bg-red-50 font-medium transition-colors">
                       <LogOut className="w-5 h-5" /> Sign out
                     </button>
                   </form>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="text-center py-3 text-sm font-semibold text-zinc-700 border border-zinc-200 rounded-xl hover:bg-zinc-50">
-                      Log in
-                    </Link>
-                    <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="text-center py-3 text-sm font-semibold text-white bg-red-600 rounded-xl">
-                      Sign up
-                    </Link>
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="border-t border-zinc-100 pt-4 mt-4">
+                  <a href="tel:+2348000000000" className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 btn-press transition-all">
+                    <Phone className="w-5 h-5" />
+                    Call Now
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </>

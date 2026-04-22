@@ -223,14 +223,14 @@ export default async function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-red-300 mb-3 drop-shadow-sm">Your next home awaits</p>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white drop-shadow-sm">Ready to move in?</h2>
             <p className="text-red-50 mb-8 max-w-lg leading-relaxed text-lg drop-shadow-sm">
-              Browse our exclusive catalog of properties today. Create an account to easily save favorites and securely request viewings.
+              Browse our exclusive catalog of properties today. Call Us to easily save favorites and securely request viewings.
             </p>
-            <Link
-              href="/auth/signup"
+            <a
+              href="tel:+2348000000000"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white text-red-700 font-bold shadow-xl hover:bg-zinc-50 btn-press transition-all"
             >
-              Create an Account <ArrowRight className="w-5 h-5" />
-            </Link>
+              Contact Us <ArrowRight className="w-5 h-5" />
+            </a>
           </div>
         </div>
       </section>
