@@ -2,10 +2,10 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import type { ListingWithImages, ListingWithOwner } from '@/types'
+import type { ListingWithImages, ListingWithOwner, ListingType } from '@/types'
 
 export interface ListingFilters {
-  type?: 'rent' | 'airbnb'
+  type?: ListingType
   city?: string
   priceMin?: number
   priceMax?: number
@@ -107,7 +107,7 @@ export async function createListing(formData: FormData) {
   const title = formData.get('title') as string
   const description = formData.get('description') as string
   const price = parseFloat(formData.get('price') as string)
-  const type = formData.get('type') as 'rent' | 'airbnb'
+  const type = formData.get('type') as ListingType
   const location = formData.get('location') as string
   const city = formData.get('city') as string
   const state = formData.get('state') as string

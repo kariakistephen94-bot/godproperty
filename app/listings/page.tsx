@@ -39,7 +39,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
         <div className="flex items-end justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-zinc-900">
-              {filters.type === 'rent' ? 'Rental Properties' : filters.type === 'airbnb' ? 'Short Stays' : 'All Properties'}
+              {filters.type === 'rent' ? 'Rental Properties' : filters.type === 'airbnb' ? 'Short Stays' : filters.type === 'land' ? 'Land Sales' : filters.type === 'materials' ? 'Building Materials' : 'All Properties'}
             </h1>
             <p className="text-sm text-zinc-500 mt-1">
               {listings.length} {listings.length === 1 ? 'property' : 'properties'} found
