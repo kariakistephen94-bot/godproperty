@@ -32,6 +32,7 @@ export interface Listing {
   bedrooms: number
   bathrooms: number
   max_guests: number
+  landlord_phone: string | null
   is_published: boolean
   created_at: string
   updated_at: string

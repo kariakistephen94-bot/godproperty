@@ -24,6 +24,7 @@ export default function NewListingPage() {
   const [bedrooms, setBedrooms] = useState('1')
   const [bathrooms, setBathrooms] = useState('1')
   const [maxGuests, setMaxGuests] = useState('2')
+  const [landlordPhone, setLandlordPhone] = useState('')
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -67,6 +68,7 @@ export default function NewListingPage() {
       formData.set('bedrooms', bedrooms)
       formData.set('bathrooms', bathrooms)
       formData.set('maxGuests', maxGuests)
+      formData.set('landlordPhone', landlordPhone)
       formData.set('amenities', selectedAmenities.join(','))
       formData.set('isPublished', publish ? 'true' : 'false')
 
@@ -199,12 +201,17 @@ export default function NewListingPage() {
               )}
             </div>
 
-            {type === 'airbnb' && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Max Guests</label>
                 <input type="number" value={maxGuests} onChange={e => setMaxGuests(e.target.value)} min="1" className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500" />
               </div>
             )}
+
+            <div className="pt-4 border-t border-slate-100">
+              <label className="block text-sm font-bold text-rose-600 mb-1.5 uppercase tracking-wider">Landlord Number (Private)</label>
+              <input type="tel" value={landlordPhone} onChange={e => setLandlordPhone(e.target.value)} placeholder="+234..." className="w-full px-4 py-3 rounded-xl border border-rose-100 bg-rose-50/30 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500" />
+              <p className="text-[11px] text-slate-500 mt-1">Only you and other admins can see this number. It will never be shown publicly.</p>
+            </div>
           </div>
         )}
 
@@ -214,7 +221,7 @@ export default function NewListingPage() {
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-3">Photos</label>
-              <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-rose-300 transition-colors">
+              <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-rose-300 transition-colors">
                 <Upload className="w-10 h-10 text-slate-400 mx-auto mb-3" />
                 <p className="text-sm text-slate-600 mb-1">Drag and drop images or click to browse</p>
                 <p className="text-xs text-slate-400">JPG, PNG, WebP up to 10MB each</p>
@@ -279,6 +286,7 @@ export default function NewListingPage() {
                 </>
               )}
               {type === 'airbnb' && <ReviewItem label="Max Guests" value={maxGuests} />}
+              <ReviewItem label="Landlord Phone" value={landlordPhone || 'Not provided'} />
               <ReviewItem label="Amenities" value={selectedAmenities.map(a => AMENITY_LABELS[a]).join(', ') || 'None'} />
               <ReviewItem label="Photos" value={`${imageFiles.length} file(s)`} />
             </div>

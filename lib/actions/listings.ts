@@ -134,6 +134,7 @@ export async function createListing(formData: FormData) {
   const amenitiesStr = formData.get('amenities') as string
   const amenities = amenitiesStr ? amenitiesStr.split(',') : []
   const isPublished = formData.get('isPublished') === 'true'
+  const landlordPhone = formData.get('landlordPhone') as string || null
 
   const { data, error } = await supabase
     .from('listings')
@@ -151,6 +152,7 @@ export async function createListing(formData: FormData) {
       bathrooms,
       max_guests: maxGuests,
       amenities,
+      landlord_phone: landlordPhone,
       is_published: isPublished,
     })
     .select()
@@ -160,15 +162,20 @@ export async function createListing(formData: FormData) {
 
   // Handle image uploads
   const images = formData.getAll('images') as File[]
-  if (images.length > 0 && images[0].size > 0) {
-    for (let i = 0; i < images.length; i++) {
-      const file = images[i]
+  const validImages = images.filter(img => img.size > 0)
+  
+  if (validImages.length > 0) {
+    for (let i = 0; i < validImages.length; i++) {
+      const file = validImages[i]
       const fileExt = file.name.split('.').pop()
       const fileName = `${data.id}/${Date.now()}_${i}.${fileExt}`
 
       const { error: uploadError } = await supabase.storage
         .from('listing-images')
-        .upload(fileName, file)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
 
       if (!uploadError) {
         const { data: urlData } = supabase.storage
@@ -181,6 +188,8 @@ export async function createListing(formData: FormData) {
           position: i,
           is_cover: i === 0,
         })
+      } else {
+        console.error('Error uploading image:', uploadError)
       }
     }
   }
@@ -197,9 +206,9 @@ export async function updateListing(id: string, formData: FormData) {
   if (!user) throw new Error('Unauthorized')
 
   const updates: Record<string, unknown> = {}
-  const fields = ['title', 'description', 'type', 'location', 'city', 'state', 'country']
+  const fields = ['title', 'description', 'type', 'location', 'city', 'state', 'country', 'landlord_phone']
   fields.forEach(field => {
-    const val = formData.get(field)
+    const val = formData.get(field === 'landlord_phone' ? 'landlordPhone' : field)
     if (val !== null) updates[field] = val
   })
 
@@ -228,6 +237,45 @@ export async function updateListing(id: string, formData: FormData) {
     .eq('owner_id', user.id)
 
   if (error) throw new Error(error.message)
+
+  // Handle new image uploads
+  const images = formData.getAll('images') as File[]
+  const validImages = images.filter(img => img.size > 0)
+  
+  if (validImages.length > 0) {
+    // Get current max position
+    const { data: currentImages } = await supabase
+      .from('listing_images')
+      .select('position')
+      .eq('listing_id', id)
+      .order('position', { ascending: false })
+      .limit(1)
+    
+    let startPos = (currentImages && currentImages.length > 0) ? currentImages[0].position + 1 : 0
+
+    for (let i = 0; i < validImages.length; i++) {
+      const file = validImages[i]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${id}/${Date.now()}_${i}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('listing-images')
+        .upload(fileName, file)
+
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from('listing-images')
+          .getPublicUrl(fileName)
+
+        await supabase.from('listing_images').insert({
+          listing_id: id,
+          url: urlData.publicUrl,
+          position: startPos + i,
+          is_cover: startPos + i === 0,
+        })
+      }
+    }
+  }
 
   revalidatePath('/listings')
   revalidatePath(`/listings/${id}`)

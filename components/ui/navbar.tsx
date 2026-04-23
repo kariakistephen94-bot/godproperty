@@ -38,6 +38,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <NavLink href="/">Home</NavLink>
             <NavLink href="/listings">Explore</NavLink>
+            <NavLink href="/list-with-us">List With Us</NavLink>
             {user && (
               <>
                 <NavLink href="/dashboard">Dashboard</NavLink>
@@ -116,6 +117,7 @@ export default function Navbar() {
             <div className="px-4 py-5 space-y-1">
               <MobileNavLink href="/" onClick={() => setMobileOpen(false)} icon={<Home className="w-5 h-5" />}>Home</MobileNavLink>
               <MobileNavLink href="/listings" onClick={() => setMobileOpen(false)} icon={<Search className="w-5 h-5" />}>Explore</MobileNavLink>
+              <MobileNavLink href="/list-with-us" onClick={() => setMobileOpen(false)} icon={<Plus className="w-5 h-5" />}>List With Us</MobileNavLink>
               {user && (
                 <>
                   <MobileNavLink href="/dashboard" onClick={() => setMobileOpen(false)} icon={<LayoutDashboard className="w-5 h-5" />}>Dashboard</MobileNavLink>

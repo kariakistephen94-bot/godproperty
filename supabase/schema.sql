@@ -61,6 +61,7 @@ CREATE TABLE listings (
   bedrooms INTEGER NOT NULL DEFAULT 0,
   bathrooms INTEGER NOT NULL DEFAULT 0,
   max_guests INTEGER NOT NULL DEFAULT 1,
+  landlord_phone TEXT,
   is_published BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
