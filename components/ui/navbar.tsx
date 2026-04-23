@@ -94,7 +94,7 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              <a href="tel:+2348000000000" className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 btn-press transition-all">
+              <a href="tel:+2348107920394" className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/30 btn-press transition-all">
                 <Phone className="w-4 h-4" />
                 Call Now
               </a>
@@ -131,7 +131,7 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="border-t border-zinc-100 pt-4 mt-4">
-                  <a href="tel:+2348000000000" className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 btn-press transition-all">
+                  <a href="tel:+2348107920394" className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-white bg-red-600 rounded-xl shadow-md shadow-red-600/25 hover:bg-red-700 btn-press transition-all">
                     <Phone className="w-5 h-5" />
                     Call Now
                   </a>

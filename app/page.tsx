@@ -226,7 +226,7 @@ export default async function HomePage() {
               Browse our exclusive catalog of properties today. Call Us to easily save favorites and securely request viewings.
             </p>
             <a
-              href="tel:+2348000000000"
+              href="tel:+2348107920394"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white text-red-700 font-bold shadow-xl hover:bg-zinc-50 btn-press transition-all"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
