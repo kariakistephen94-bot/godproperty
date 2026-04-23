@@ -201,6 +201,7 @@ export default function NewListingPage() {
               )}
             </div>
 
+            {type === 'airbnb' && (
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Max Guests</label>
                 <input type="number" value={maxGuests} onChange={e => setMaxGuests(e.target.value)} min="1" className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500" />
