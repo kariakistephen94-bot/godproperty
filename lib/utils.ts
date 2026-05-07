@@ -1,17 +1,17 @@
-/** Format price with currency symbol */
-export function formatPrice(price: number, type?: 'rent' | 'airbnb' | 'land' | 'materials' | string): string {
-  const formatted = new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price)
+export function formatPrice(price: number, type?: string): string {
+  let verbalPrice = ''
+  
+  if (price >= 1000000000) {
+    verbalPrice = `${(price / 1000000000).toFixed(1).replace(/\.0$/, '')} billion`
+  } else if (price >= 1000000) {
+    verbalPrice = `${(price / 1000000).toFixed(1).replace(/\.0$/, '')} million`
+  } else if (price >= 1000) {
+    verbalPrice = `${(price / 1000).toFixed(1).replace(/\.0$/, '')} thousand`
+  } else {
+    verbalPrice = price.toString()
+  }
 
-  if (type === 'airbnb') return `${formatted}/night`
-  if (type === 'rent') return `${formatted}/month`
-  if (type === 'land') return `${formatted}/plot`
-  if (type === 'materials') return `${formatted}/unit`
-  return formatted
+  return `${verbalPrice} naira`
 }
 
 /** Format date to readable string */

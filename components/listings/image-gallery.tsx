@@ -22,25 +22,37 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
     'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format',
   ]
 
-  const displayImages = images.length > 0 ? images.map(img => img.url) : placeholderImages
+  const displayMedia = images.length > 0 ? images : [{ url: placeholderImages[0], type: 'image' }] as any[]
 
   return (
     <>
       {/* Gallery Grid */}
       <div className="rounded-2xl overflow-hidden cursor-pointer" onClick={() => setLightboxOpen(true)}>
-        {displayImages.length === 1 ? (
-          <img src={displayImages[0]} alt={title} className="w-full h-[400px] sm:h-[500px] object-cover" />
+        {displayMedia.length === 1 ? (
+          displayMedia[0].type === 'video' ? (
+            <video src={displayMedia[0].url} className="w-full h-[400px] sm:h-[500px] object-cover" muted playsInline loop autoPlay />
+          ) : (
+            <img src={displayMedia[0].url} alt={title} className="w-full h-[400px] sm:h-[500px] object-cover" />
+          )
         ) : (
           <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[300px] sm:h-[400px] lg:h-[480px]">
             <div className="col-span-2 row-span-2">
-              <img src={displayImages[0]} alt={title} className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+              {displayMedia[0].type === 'video' ? (
+                <video src={displayMedia[0].url} className="w-full h-full object-cover hover:opacity-90 transition-opacity" muted playsInline loop autoPlay />
+              ) : (
+                <img src={displayMedia[0].url} alt={title} className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+              )}
             </div>
-            {displayImages.slice(1, 5).map((url, i) => (
+            {displayMedia.slice(1, 5).map((media, i) => (
               <div key={i} className="relative">
-                <img src={url} alt={`${title} ${i + 2}`} className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
-                {i === 3 && displayImages.length > 5 && (
+                {media.type === 'video' ? (
+                  <video src={media.url} className="w-full h-full object-cover hover:opacity-90 transition-opacity" muted playsInline loop />
+                ) : (
+                  <img src={media.url} alt={`${title} ${i + 2}`} className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+                )}
+                {i === 3 && displayMedia.length > 5 && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <span className="text-white font-semibold text-lg">+{displayImages.length - 5}</span>
+                    <span className="text-white font-semibold text-lg">+{displayMedia.length - 5}</span>
                   </div>
                 )}
               </div>
@@ -68,22 +80,32 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
             <ChevronLeft className="w-8 h-8" />
           </button>
 
-          <img
-            src={displayImages[currentIndex]}
-            alt={`${title} ${currentIndex + 1}`}
-            className="max-h-[85vh] max-w-[90vw] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {displayMedia[currentIndex].type === 'video' ? (
+            <video
+              src={displayMedia[currentIndex].url}
+              className="max-h-[85vh] max-w-[90vw] object-contain"
+              controls
+              autoPlay
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <img
+              src={displayMedia[currentIndex].url}
+              alt={`${title} ${currentIndex + 1}`}
+              className="max-h-[85vh] max-w-[90vw] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
 
           <button
-            onClick={(e) => { e.stopPropagation(); setCurrentIndex(Math.min(displayImages.length - 1, currentIndex + 1)) }}
-            className={cn("absolute right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors", currentIndex === displayImages.length - 1 && "opacity-30 cursor-default")}
+            onClick={(e) => { e.stopPropagation(); setCurrentIndex(Math.min(displayMedia.length - 1, currentIndex + 1)) }}
+            className={cn("absolute right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors", currentIndex === displayMedia.length - 1 && "opacity-30 cursor-default")}
           >
             <ChevronRight className="w-8 h-8" />
           </button>
 
           <div className="absolute bottom-4 text-white text-sm">
-            {currentIndex + 1} / {displayImages.length}
+            {currentIndex + 1} / {displayMedia.length}
           </div>
         </div>
       )}

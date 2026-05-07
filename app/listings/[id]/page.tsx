@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation'
-import { getListingById } from '@/lib/actions/listings'
+import { getListingById, deleteListing } from '@/lib/actions/listings'
 import { getBookingsForListing } from '@/lib/actions/bookings'
+import { createClient } from '@/lib/supabase/server'
 import { formatPrice, AMENITY_LABELS } from '@/lib/utils'
 import BookingCalendar from '@/components/bookings/booking-calendar'
 
 import ImageGallery from '@/components/listings/image-gallery'
+import DeleteListingButton from '@/components/listings/delete-listing-button'
 import { MapPin, Bed, Bath, Users, Star, Shield, UserCircle, Phone } from 'lucide-react'
+import Link from 'next/link'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -22,6 +25,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const listing = await getListingById(id)
 
   if (!listing) notFound()
+  
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const isOwner = user?.id === listing.owner_id
 
   const existingBookings = await getBookingsForListing(id)
   const images = listing.listing_images?.sort((a, b) => a.position - b.position) || []
@@ -169,6 +176,21 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
               </div>
+
+              {isOwner && (
+                <div className="mt-6 pt-6 border-t border-slate-100">
+                  <h4 className="text-sm font-bold text-slate-900 mb-3">Owner Controls</h4>
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/dashboard/listings/${id}/edit`}
+                      className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all text-center text-sm"
+                    >
+                      Edit Listing
+                    </Link>
+                    <DeleteListingButton id={id} />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

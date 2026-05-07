@@ -7,7 +7,7 @@
 -- ============================================
 
 CREATE TYPE user_role AS ENUM ('user', 'agent', 'admin');
-CREATE TYPE listing_type AS ENUM ('rent', 'airbnb', 'land', 'materials');
+CREATE TYPE listing_type AS ENUM ('rent', 'airbnb', 'land', 'materials', 'lodge');
 CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
 
 -- 2. PROFILES (extends auth.users)
@@ -81,6 +81,8 @@ CREATE TABLE listing_images (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'image', -- 'image' or 'video'
+  thumbnail_url TEXT,
   position INTEGER NOT NULL DEFAULT 0,
   is_cover BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()

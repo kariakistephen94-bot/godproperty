@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createListing } from '@/lib/actions/listings'
-import { ALL_AMENITIES, AMENITY_LABELS } from '@/lib/utils'
-import { ArrowLeft, ArrowRight, Upload, X, Home, Sparkles, MapPin, Hammer } from 'lucide-react'
+import { ALL_AMENITIES, AMENITY_LABELS, formatPrice } from '@/lib/utils'
+import { ArrowLeft, ArrowRight, Upload, X, Home, Sparkles, MapPin, Hammer, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function NewListingPage() {
@@ -17,7 +17,7 @@ export default function NewListingPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
-  const [type, setType] = useState<'rent' | 'airbnb' | 'land' | 'materials'>('rent')
+  const [type, setType] = useState<'rent' | 'airbnb' | 'land' | 'materials' | 'lodge'>('rent')
   const [location, setLocation] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
@@ -26,24 +26,27 @@ export default function NewListingPage() {
   const [maxGuests, setMaxGuests] = useState('2')
   const [landlordPhone, setLandlordPhone] = useState('')
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [imageFiles, setImageFiles] = useState<File[]>([])
-  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [mediaFiles, setMediaFiles] = useState<File[]>([])
+  const [mediaPreviews, setMediaPreviews] = useState<{url: string, type: string}[]>([])
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setImageFiles(prev => [...prev, ...files])
+    setMediaFiles(prev => [...prev, ...files])
     files.forEach(file => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreviews(prev => [...prev, reader.result as string])
+        setMediaPreviews(prev => [...prev, {
+          url: reader.result as string,
+          type: file.type.startsWith('video/') ? 'video' : 'image'
+        }])
       }
       reader.readAsDataURL(file)
     })
   }
 
-  const removeImage = (index: number) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index))
-    setImagePreviews(prev => prev.filter((_, i) => i !== index))
+  const removeMedia = (index: number) => {
+    setMediaFiles(prev => prev.filter((_, i) => i !== index))
+    setMediaPreviews(prev => prev.filter((_, i) => i !== index))
   }
 
   const toggleAmenity = (amenity: string) => {
@@ -72,7 +75,15 @@ export default function NewListingPage() {
       formData.set('amenities', selectedAmenities.join(','))
       formData.set('isPublished', publish ? 'true' : 'false')
 
-      imageFiles.forEach(file => formData.append('images', file))
+      mediaFiles.forEach(file => formData.append('images', file))
+
+      // Validation for land showcase
+      if (type === 'land') {
+        const hasVideo = mediaFiles.some(file => file.type.startsWith('video/'))
+        if (!hasVideo) {
+          throw new Error('Land listings must include at least one video showcase.')
+        }
+      }
 
       await createListing(formData)
       router.push('/dashboard/listings')
@@ -151,6 +162,13 @@ export default function NewListingPage() {
                   <Hammer className="w-6 h-6 mx-auto mb-1" />
                   <span className="font-medium text-sm">Materials</span>
                 </button>
+                <button type="button" onClick={() => setType('lodge')} className={cn(
+                  "p-4 rounded-xl border-2 text-center transition-all",
+                  type === 'lodge' ? "border-rose-500 bg-rose-50" : "border-slate-200 hover:border-slate-300"
+                )}>
+                  <Users className="w-6 h-6 mx-auto mb-1" />
+                  <span className="font-medium text-sm">Lodge</span>
+                </button>
               </div>
             </div>
 
@@ -166,7 +184,7 @@ export default function NewListingPage() {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Price ({type === 'airbnb' ? 'per night' : type === 'materials' ? 'per unit' : type === 'land' ? 'per plot' : 'per month'})
+                Price
               </label>
               <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="0" className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500" />
             </div>
@@ -221,24 +239,35 @@ export default function NewListingPage() {
           <div className="space-y-6">
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-3">Photos</label>
+              <label className="block text-sm font-medium text-slate-700 mb-3">Photos & Videos</label>
               <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-rose-300 transition-colors">
                 <Upload className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                <p className="text-sm text-slate-600 mb-1">Drag and drop images or click to browse</p>
-                <p className="text-xs text-slate-400">JPG, PNG, WebP up to 10MB each</p>
-                <input type="file" accept="image/*" multiple onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                <p className="text-sm text-slate-600 mb-1">Drag and drop images/videos or click to browse</p>
+                <p className="text-xs text-slate-400">JPG, PNG, WebP, MP4, MOV up to 50MB each</p>
+                <input type="file" accept="image/*,video/*" multiple onChange={handleMediaChange} className="absolute inset-0 opacity-0 cursor-pointer" />
               </div>
 
-              {imagePreviews.length > 0 && (
+              {mediaPreviews.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
-                  {imagePreviews.map((url, i) => (
+                  {mediaPreviews.map((media, i) => (
                     <div key={i} className="relative aspect-square rounded-xl overflow-hidden group">
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      <button onClick={() => removeImage(i)} className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      {media.type === 'video' ? (
+                        <video src={media.url} className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={media.url} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button onClick={() => removeMedia(i)} className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity">
                         <X className="w-4 h-4" />
                       </button>
                       {i === 0 && (
                         <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-white/90 rounded-md text-xs font-medium">Cover</span>
+                      )}
+                      {media.type === 'video' && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                          <div className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
+                            <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                          </div>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -277,8 +306,8 @@ export default function NewListingPage() {
 
             <div className="divide-y divide-slate-100">
               <ReviewItem label="Title" value={title} />
-              <ReviewItem label="Type" value={type === 'airbnb' ? 'Short Stay' : type === 'land' ? 'Land' : type === 'materials' ? 'Materials' : 'Rental'} />
-              <ReviewItem label="Price" value={`₦${price} ${type === 'airbnb' ? '/ night' : type === 'materials' ? '/ unit' : type === 'land' ? '/ plot' : '/ month'}`} />
+              <ReviewItem label="Type" value={type === 'airbnb' ? 'Short Stay' : type === 'land' ? 'Land' : type === 'materials' ? 'Materials' : type === 'lodge' ? 'Lodge' : 'Rental'} />
+              <ReviewItem label="Price" value={formatPrice(Number(price))} />
               <ReviewItem label="Location" value={`${location}, ${city}, ${state}`} />
               {type !== 'land' && type !== 'materials' && (
                 <>
@@ -289,7 +318,7 @@ export default function NewListingPage() {
               {type === 'airbnb' && <ReviewItem label="Max Guests" value={maxGuests} />}
               <ReviewItem label="Landlord Phone" value={landlordPhone || 'Not provided'} />
               <ReviewItem label="Amenities" value={selectedAmenities.map(a => AMENITY_LABELS[a]).join(', ') || 'None'} />
-              <ReviewItem label="Photos" value={`${imageFiles.length} file(s)`} />
+              <ReviewItem label="Media" value={`${mediaFiles.length} file(s)`} />
             </div>
 
             <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">

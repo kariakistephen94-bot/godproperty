@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Plus, Edit, Eye, EyeOff, Trash2, MapPin, Bed, Bath } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import ListingActions from './listing-actions'
+import DeleteListingButton from '@/components/listings/delete-listing-button'
 
 export const metadata = {
   title: 'My Listings',
@@ -43,16 +44,22 @@ export default async function MyListingsPage() {
       ) : (
         <div className="space-y-4">
           {listings.map((listing) => {
-            const coverImage = listing.listing_images?.find(img => img.is_cover)?.url
-              || listing.listing_images?.[0]?.url
-              || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&auto=format'
+            const coverMedia = listing.listing_images?.find(img => img.is_cover)
+              || listing.listing_images?.[0]
+            
+            const mediaUrl = coverMedia?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&auto=format'
+            const isVideo = coverMedia?.type === 'video'
 
             return (
               <div key={listing.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 <div className="flex flex-col sm:flex-row">
-                  {/* Image */}
-                  <div className="sm:w-48 h-40 sm:h-auto shrink-0">
-                    <img src={coverImage} alt={listing.title} className="w-full h-full object-cover" />
+                  {/* Image/Video */}
+                  <div className="sm:w-48 h-40 sm:h-auto shrink-0 bg-slate-100">
+                    {isVideo ? (
+                      <video src={mediaUrl} className="w-full h-full object-cover" muted playsInline />
+                    ) : (
+                      <img src={mediaUrl} alt={listing.title} className="w-full h-full object-cover" />
+                    )}
                   </div>
 
                   {/* Content */}
@@ -73,13 +80,23 @@ export default async function MyListingsPage() {
                         <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
                           <span className="flex items-center gap-1"><Bed className="w-3.5 h-3.5" /> {listing.bedrooms}</span>
                           <span className="flex items-center gap-1"><Bath className="w-3.5 h-3.5" /> {listing.bathrooms}</span>
-                          <span className="capitalize">{listing.type === 'airbnb' ? 'Short Stay' : 'Rental'}</span>
+                          <span className="capitalize">
+                            {listing.type === 'airbnb' ? 'Short Stay' : 
+                             listing.type === 'land' ? 'Land' : 
+                             listing.type === 'materials' ? 'Building Materials' : 
+                             listing.type === 'lodge' ? 'Lodge' : 'Rental'}
+                          </span>
                         </div>
                         <p className="text-lg font-bold text-slate-900">{formatPrice(listing.price, listing.type)}</p>
                       </div>
 
                       {/* Actions */}
-                      <ListingActions listingId={listing.id} isPublished={listing.is_published} />
+                      <div className="flex items-center gap-2">
+                        <ListingActions listingId={listing.id} isPublished={listing.is_published} />
+                        <div className="hidden sm:block">
+                          <DeleteListingButton id={listing.id} variant="icon" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

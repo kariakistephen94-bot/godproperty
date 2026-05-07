@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import cloudinary from '@/lib/cloudinary'
 import type { ListingWithImages, ListingWithOwner, ListingType } from '@/types'
 
 export interface ListingFilters {
@@ -160,36 +161,42 @@ export async function createListing(formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  // Handle image uploads
-  const images = formData.getAll('images') as File[]
-  const validImages = images.filter(img => img.size > 0)
+  // Handle media uploads (images and videos) with Cloudinary
+  const media = formData.getAll('images') as File[]
+  const validMedia = media.filter(m => m.size > 0)
   
-  if (validImages.length > 0) {
-    for (let i = 0; i < validImages.length; i++) {
-      const file = validImages[i]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${data.id}/${Date.now()}_${i}.${fileExt}`
+  if (validMedia.length > 0) {
+    for (let i = 0; i < validMedia.length; i++) {
+      const file = validMedia[i]
+      const isVideo = file.type.startsWith('video/')
+      
+      try {
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
 
-      const { error: uploadError } = await supabase.storage
-        .from('listing-images')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
-
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage
-          .from('listing-images')
-          .getPublicUrl(fileName)
+        const uploadResult = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              resource_type: isVideo ? 'video' : 'image',
+              folder: `listings/${data.id}`,
+            },
+            (error, result) => {
+              if (error) reject(error)
+              else resolve(result)
+            }
+          )
+          uploadStream.end(buffer)
+        }) as any
 
         await supabase.from('listing_images').insert({
           listing_id: data.id,
-          url: urlData.publicUrl,
+          url: uploadResult.secure_url,
+          type: isVideo ? 'video' : 'image',
           position: i,
           is_cover: i === 0,
         })
-      } else {
-        console.error('Error uploading image:', uploadError)
+      } catch (uploadError) {
+        console.error('Error uploading to Cloudinary:', uploadError)
       }
     }
   }
@@ -238,11 +245,11 @@ export async function updateListing(id: string, formData: FormData) {
 
   if (error) throw new Error(error.message)
 
-  // Handle new image uploads
-  const images = formData.getAll('images') as File[]
-  const validImages = images.filter(img => img.size > 0)
+  // Handle new media uploads with Cloudinary
+  const media = formData.getAll('images') as File[]
+  const validMedia = media.filter(m => m.size > 0)
   
-  if (validImages.length > 0) {
+  if (validMedia.length > 0) {
     // Get current max position
     const { data: currentImages } = await supabase
       .from('listing_images')
@@ -253,26 +260,37 @@ export async function updateListing(id: string, formData: FormData) {
     
     let startPos = (currentImages && currentImages.length > 0) ? currentImages[0].position + 1 : 0
 
-    for (let i = 0; i < validImages.length; i++) {
-      const file = validImages[i]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${id}/${Date.now()}_${i}.${fileExt}`
+    for (let i = 0; i < validMedia.length; i++) {
+      const file = validMedia[i]
+      const isVideo = file.type.startsWith('video/')
 
-      const { error: uploadError } = await supabase.storage
-        .from('listing-images')
-        .upload(fileName, file)
+      try {
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
 
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage
-          .from('listing-images')
-          .getPublicUrl(fileName)
+        const uploadResult = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              resource_type: isVideo ? 'video' : 'image',
+              folder: `listings/${id}`,
+            },
+            (error, result) => {
+              if (error) reject(error)
+              else resolve(result)
+            }
+          )
+          uploadStream.end(buffer)
+        }) as any
 
         await supabase.from('listing_images').insert({
           listing_id: id,
-          url: urlData.publicUrl,
+          url: uploadResult.secure_url,
+          type: isVideo ? 'video' : 'image',
           position: startPos + i,
           is_cover: startPos + i === 0,
         })
+      } catch (uploadError) {
+        console.error('Error uploading to Cloudinary:', uploadError)
       }
     }
   }
@@ -281,6 +299,9 @@ export async function updateListing(id: string, formData: FormData) {
   revalidatePath(`/listings/${id}`)
   revalidatePath('/dashboard/listings')
 }
+
+
+
 
 export async function deleteListing(id: string) {
   const supabase = await createClient()

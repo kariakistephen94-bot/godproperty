@@ -78,9 +78,16 @@ export default function SearchBar() {
             <div>
               <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Type</label>
               <div className="flex gap-1.5">
-                {[{ value: '', label: 'All' }, { value: 'rent', label: 'Rent' }, { value: 'airbnb', label: 'Stay' }].map(opt => (
+                {[
+                  { value: '', label: 'All' }, 
+                  { value: 'rent', label: 'Rent' }, 
+                  { value: 'airbnb', label: 'Stay' },
+                  { value: 'land', label: 'Land' },
+                  { value: 'materials', label: 'Material' },
+                  { value: 'lodge', label: 'Lodge' }
+                ].map(opt => (
                   <button key={opt.value} onClick={() => setType(opt.value)}
-                    className={cn("flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all border",
+                    className={cn("px-3 py-2 rounded-lg text-xs font-semibold transition-all border shrink-0",
                       type === opt.value ? "bg-red-600 text-white border-red-600" : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300")}>
                     {opt.label}
                   </button>

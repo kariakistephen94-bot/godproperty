@@ -15,19 +15,32 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const [currentImage, setCurrentImage] = useState(0)
 
   const images = listing.listing_images?.sort((a, b) => a.position - b.position) || []
-  const coverImage = images[0]?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format'
-  const allImages = images.length > 0 ? images.map(img => img.url) : [coverImage]
+  const coverMedia = images[0]
+  const allMedia = images.length > 0 ? images : [{ url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format', type: 'image' }]
+  const currentMedia = allMedia[currentImage]
 
   return (
     <Link href={`/listings/${listing.id}`} className="group block">
       <div className="rounded-2xl overflow-hidden bg-white border border-zinc-100 hover:shadow-xl hover:shadow-zinc-200/60 transition-all duration-300 hover:-translate-y-1">
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
-          <img
-            src={allImages[currentImage]}
-            alt={listing.title}
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-          />
+          {currentMedia.type === 'video' ? (
+            <video
+              src={currentMedia.url}
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+              muted
+              playsInline
+              loop
+              onMouseOver={(e) => e.currentTarget.play()}
+              onMouseOut={(e) => e.currentTarget.pause()}
+            />
+          ) : (
+            <img
+              src={currentMedia.url}
+              alt={listing.title}
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            />
+          )}
 
           {/* Type Badge */}
           <div className="absolute top-3 left-3">
@@ -41,6 +54,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
               {listing.type === 'airbnb' ? 'SHORT STAY' :
                listing.type === 'land' ? 'LAND' :
                listing.type === 'materials' ? 'MATERIAL' :
+               listing.type === 'lodge' ? 'LODGE' :
                'RENTAL'}
             </span>
           </div>
@@ -54,7 +68,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </button>
 
           {/* Image Nav */}
-          {allImages.length > 1 && (
+          {allMedia.length > 1 && (
             <>
               <button
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentImage(Math.max(0, currentImage - 1)) }}
@@ -63,15 +77,15 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentImage(Math.min(allImages.length - 1, currentImage + 1)) }}
-                className={cn("absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow", currentImage === allImages.length - 1 && "hidden")}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentImage(Math.min(allMedia.length - 1, currentImage + 1)) }}
+                className={cn("absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow", currentImage === allMedia.length - 1 && "hidden")}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
 
               {/* Dots */}
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-                {allImages.slice(0, 5).map((_, i) => (
+                {allMedia.slice(0, 5).map((_, i) => (
                   <div key={i} className={cn("h-1.5 rounded-full transition-all", currentImage === i ? "bg-white w-4" : "bg-white/50 w-1.5")} />
                 ))}
               </div>

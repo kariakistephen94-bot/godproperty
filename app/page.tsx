@@ -1,10 +1,17 @@
 import Link from 'next/link'
 import { getListings } from '@/lib/actions/listings'
 import ListingGrid from '@/components/listings/listing-grid'
+import ListingCard from '@/components/listings/listing-card'
 import { Search, Shield, Zap, Heart, ArrowRight, Home, Sparkles, Star, Users, Building, MapPin, Hammer, Plus } from 'lucide-react'
 
 export default async function HomePage() {
-  const featuredListings = await getListings({ limit: 8 })
+  const [featuredListings, landListings, materialListings, lodgeListings, airbnbListings] = await Promise.all([
+    getListings({ limit: 8 }),
+    getListings({ type: 'land', limit: 4 }),
+    getListings({ type: 'materials', limit: 4 }),
+    getListings({ type: 'lodge', limit: 4 }),
+    getListings({ type: 'airbnb', limit: 4 }),
+  ])
 
   return (
     <div>
@@ -89,83 +96,178 @@ export default async function HomePage() {
 
       {/* ===== CATEGORY CARDS ===== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <Link href="/listings?type=rent" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-8 sm:p-10 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <Link href="/listings?type=rent" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-6 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
             <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center text-red-600 mb-5 group-hover:scale-110 transition-transform duration-300">
-                <Home className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Home className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-zinc-900 mb-2">Monthly Rentals</h3>
-              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">Find apartments, houses, and studios for long-term rental across Nigeria.</p>
-              <span className="inline-flex items-center gap-1.5 text-red-600 font-semibold text-sm group-hover:gap-3 transition-all">
-                Browse Rentals <ArrowRight className="w-4 h-4" />
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">Rentals</h3>
+              <p className="text-zinc-500 mb-4 text-xs leading-relaxed">Apartments and houses for long-term rent.</p>
+              <span className="inline-flex items-center gap-1.5 text-red-600 font-semibold text-xs group-hover:gap-3 transition-all">
+                Browse <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-red-50/50 rounded-full group-hover:scale-[2] transition-transform duration-500" />
           </Link>
 
-          <Link href="/listings?type=airbnb" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-8 sm:p-10 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
+          <Link href="/listings?type=airbnb" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-6 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
             <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 mb-5 group-hover:scale-110 transition-transform duration-300">
-                <Sparkles className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-zinc-900 mb-2">Short Stays</h3>
-              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">Browse unique stays for vacations, getaways, and business trips.</p>
-              <span className="inline-flex items-center gap-1.5 text-orange-600 font-semibold text-sm group-hover:gap-3 transition-all">
-                Browse Stays <ArrowRight className="w-4 h-4" />
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">Short Stays</h3>
+              <p className="text-zinc-500 mb-4 text-xs leading-relaxed">Unique stays for vacations and business.</p>
+              <span className="inline-flex items-center gap-1.5 text-orange-600 font-semibold text-xs group-hover:gap-3 transition-all">
+                Browse <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-orange-50/50 rounded-full group-hover:scale-[2] transition-transform duration-500" />
           </Link>
 
-          <Link href="/listings?category=land" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-8 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
+          <Link href="/listings?type=lodge" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-6 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
             <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-5 group-hover:scale-110 transition-transform duration-300">
-                <MapPin className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-zinc-900 mb-2">Land Sales</h3>
-              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">Secure prime plots of land for residential, commercial, or agricultural use.</p>
-              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold text-sm group-hover:gap-3 transition-all">
-                View Lands <ArrowRight className="w-4 h-4" />
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">Lodges</h3>
+              <p className="text-zinc-500 mb-4 text-xs leading-relaxed">Student accommodation and hostels.</p>
+              <span className="inline-flex items-center gap-1.5 text-purple-600 font-semibold text-xs group-hover:gap-3 transition-all">
+                Browse <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-emerald-50/50 rounded-full group-hover:scale-[2] transition-transform duration-500" />
           </Link>
 
-          <Link href="/listings?category=materials" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-8 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
+          <Link href="/listings?type=land" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-6 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
             <div className="relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-5 group-hover:scale-110 transition-transform duration-300">
-                <Hammer className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <MapPin className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-zinc-900 mb-2">Building Materials</h3>
-              <p className="text-zinc-500 mb-5 text-sm leading-relaxed">High-quality sourced materials directly from manufacturers for your projects.</p>
-              <span className="inline-flex items-center gap-1.5 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
-                Shop Materials <ArrowRight className="w-4 h-4" />
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">Lands</h3>
+              <p className="text-zinc-500 mb-4 text-xs leading-relaxed">Prime plots for your next project.</p>
+              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold text-xs group-hover:gap-3 transition-all">
+                Browse <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-blue-50/50 rounded-full group-hover:scale-[2] transition-transform duration-500" />
+          </Link>
+
+          <Link href="/listings?type=materials" className="group relative overflow-hidden rounded-2xl bg-white border border-zinc-200 p-6 shadow-lg shadow-zinc-200/40 hover:shadow-xl hover:shadow-zinc-200/60 hover:-translate-y-1 transition-all duration-300">
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Hammer className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">Materials</h3>
+              <p className="text-zinc-500 mb-4 text-xs leading-relaxed">High-quality sourced materials.</p>
+              <span className="inline-flex items-center gap-1.5 text-blue-600 font-semibold text-xs group-hover:gap-3 transition-all">
+                Browse <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
           </Link>
         </div>
       </section>
 
-      {/* ===== FEATURED LISTINGS ===== */}
-      {featuredListings.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-2">Curated for you</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">Featured Properties</h2>
+      {/* ===== LAND SHOWCASE (9:16) ===== */}
+      {landListings.length > 0 && (
+        <section className="bg-white py-24 overflow-hidden border-t border-zinc-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-3">Investment Opportunities</p>
+                <h2 className="text-3xl sm:text-5xl font-black text-zinc-900">Land Showcase</h2>
+              </div>
+              <Link href="/listings?type=land" className="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-red-600 hover:text-red-700 transition-colors">
+                View All Lands <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <Link href="/listings" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-700 hover:gap-2.5 transition-all">
-              View all <ArrowRight className="w-4 h-4" />
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {landListings.map((land) => (
+                <Link key={land.id} href={`/listings/${land.id}`} className="group relative aspect-[9/16] rounded-3xl overflow-hidden bg-zinc-100 border border-zinc-200 hover:border-red-500 hover:shadow-xl hover:shadow-red-500/10 transition-all duration-500">
+                  {land.listing_images?.[0]?.type === 'video' ? (
+                    <video 
+                      src={land.listing_images[0].url} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                      muted playsInline loop autoPlay
+                    />
+                  ) : (
+                    <img 
+                      src={land.listing_images?.[0]?.url || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format'} 
+                      alt={land.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-90" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-600 text-[10px] font-bold text-white mb-3 uppercase tracking-wider shadow-lg shadow-red-600/30">
+                      <Zap className="w-3 h-3 fill-current" /> Fast Selling
+                    </div>
+                    <h3 className="text-white font-bold text-lg sm:text-xl mb-1 line-clamp-2 leading-tight group-hover:text-red-300 transition-colors">{land.title}</h3>
+                    <p className="text-zinc-200 text-xs sm:text-sm flex items-center gap-1 mb-3">
+                      <MapPin className="w-3 h-3 text-red-400" /> {land.city}
+                    </p>
+                    <div className="text-white font-black text-lg">
+                      ₦{land.price.toLocaleString()}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== LODGE RENTALS (Student Focus) ===== */}
+      {lodgeListings.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold mb-4">
+                <Users className="w-3.5 h-3.5" /> For Students & Professionals
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">Premium Lodge Rentals</h2>
+              <p className="text-zinc-500 mt-2 max-w-xl">Find comfortable, affordable, and secure lodges near your campus or workplace.</p>
+            </div>
+            <Link href="/listings?type=lodge" className="inline-flex items-center gap-2 text-sm font-bold text-red-600 hover:gap-3 transition-all">
+              Browse All Lodges <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <ListingGrid listings={featuredListings} />
-          <div className="sm:hidden mt-8 text-center">
-            <Link href="/listings" className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600">
-              View all properties <ArrowRight className="w-4 h-4" />
+          <ListingGrid listings={lodgeListings} />
+        </section>
+      )}
+
+      {/* ===== BUILDING MATERIALS ===== */}
+      {materialListings.length > 0 && (
+        <section className="bg-zinc-50 py-24 border-y border-zinc-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-3">Quality Guaranteed</p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">Building Materials</h2>
+              </div>
+              <Link href="/listings?type=materials" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600">
+                View Catalog <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {materialListings.map((item) => (
+                <ListingCard key={item.id} listing={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== AIRBNB / SHORT STAYS ===== */}
+      {airbnbListings.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-3">Vacation & Business</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">Luxury Short Stays</h2>
+            </div>
+            <Link href="/listings?type=airbnb" className="inline-flex items-center gap-2 text-sm font-bold text-red-600">
+              Explore Airbnb <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+          <ListingGrid listings={airbnbListings} />
         </section>
       )}
 

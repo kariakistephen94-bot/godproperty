@@ -3,7 +3,7 @@
 // ============================================
 
 export type UserRole = 'user' | 'agent' | 'admin'
-export type ListingType = 'rent' | 'airbnb' | 'land' | 'materials'
+export type ListingType = 'rent' | 'airbnb' | 'land' | 'materials' | 'lodge'
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed'
 
 export interface Profile {
@@ -42,6 +42,8 @@ export interface ListingImage {
   id: string
   listing_id: string
   url: string
+  type: 'image' | 'video'
+  thumbnail_url: string | null
   position: number
   is_cover: boolean
   created_at: string
