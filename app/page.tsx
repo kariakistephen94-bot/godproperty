@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getListings } from '@/lib/actions/listings'
 import ListingGrid from '@/components/listings/listing-grid'
 import ListingCard from '@/components/listings/listing-card'
+import { formatPrice } from '@/lib/utils'
 import { Search, Shield, Zap, Heart, ArrowRight, Home, Sparkles, Star, Users, Building, MapPin, Hammer, Plus } from 'lucide-react'
 
 export default async function HomePage() {
@@ -178,9 +179,13 @@ export default async function HomePage() {
               </Link>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto pb-8 sm:pb-0 scrollbar-hide snap-x snap-mandatory">
               {landListings.map((land) => (
-                <Link key={land.id} href={`/listings/${land.id}`} className="group relative aspect-[9/16] rounded-3xl overflow-hidden bg-zinc-100 border border-zinc-200 hover:border-red-500 hover:shadow-xl hover:shadow-red-500/10 transition-all duration-500">
+                <Link 
+                  key={land.id} 
+                  href={`/listings/${land.id}`} 
+                  className="group relative flex-none w-[85vw] sm:w-auto aspect-[9/16] rounded-3xl overflow-hidden bg-zinc-100 border border-zinc-200 hover:border-red-500 hover:shadow-xl hover:shadow-red-500/10 transition-all duration-500 snap-center"
+                >
                   {land.listing_images?.[0]?.type === 'video' ? (
                     <video 
                       src={land.listing_images[0].url} 
@@ -195,16 +200,16 @@ export default async function HomePage() {
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-90" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-600 text-[10px] font-bold text-white mb-3 uppercase tracking-wider shadow-lg shadow-red-600/30">
-                      <Zap className="w-3 h-3 fill-current" /> Fast Selling
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-7">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-600 text-[10px] font-bold text-white mb-4 uppercase tracking-wider shadow-lg shadow-red-600/30">
+                      <Zap className="w-3.5 h-3.5 fill-current" /> Fast Selling
                     </div>
-                    <h3 className="text-white font-bold text-lg sm:text-xl mb-1 line-clamp-2 leading-tight group-hover:text-red-300 transition-colors">{land.title}</h3>
-                    <p className="text-zinc-200 text-xs sm:text-sm flex items-center gap-1 mb-3">
-                      <MapPin className="w-3 h-3 text-red-400" /> {land.city}
+                    <h3 className="text-white font-bold text-xl sm:text-2xl mb-2 line-clamp-2 leading-tight group-hover:text-red-300 transition-colors">{land.title}</h3>
+                    <p className="text-zinc-200 text-sm flex items-center gap-1.5 mb-4">
+                      <MapPin className="w-4 h-4 text-red-400" /> {land.city}
                     </p>
-                    <div className="text-white font-black text-lg">
-                      ₦{land.price.toLocaleString()}
+                    <div className="text-white font-black text-xl sm:text-2xl">
+                      {formatPrice(land.price)}
                     </div>
                   </div>
                 </Link>
